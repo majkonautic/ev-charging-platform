@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMSP Mobile App | EV Charging Platform Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Leaflet Plugins -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    
+    <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css" />
+    <link href="/styles/output.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Map Styles */
+        .custom-cluster-icon {
+            background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .cluster-marker {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            line-height: 34px;
+        }
+        
+        .custom-popup .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            padding: 0;
+        }
+        
+        .custom-popup .leaflet-popup-content {
+            margin: 0;
+            border-radius: 12px;
+        }
+        
+        .custom-charging-marker {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .custom-charging-marker:hover {
+            transform: scale(1.1);
+        }
+        
+        .user-location-marker {
+            cursor: pointer;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Leaflet control customizations */
+        .leaflet-control-geocoder {
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+        
+        .leaflet-routing-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Modern Mobile Container with Shadcn styling */
+        .mobile-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: hsl(var(--background));
+            min-height: 100vh;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 0;
+        }
+        
+        .screen {
+            display: none;
+            padding: 1rem;
+            min-height: calc(100vh - 88px);
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* Modern Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: hsl(var(--background));
+            border-top: 1px solid hsl(var(--border));
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 8px 20px 8px;
+            backdrop-filter: blur(12px);
+            z-index: 50;
+        }
+        
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            color: hsl(var(--muted-foreground));
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            min-height: 52px;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .nav-btn.active {
+            color: hsl(var(--primary));
+            background: hsl(var(--primary) / 0.1);
+            transform: scale(1.05);
+        }
+        
+        .nav-btn.active::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 3px;
+            background: hsl(var(--primary));
+            border-radius: 2px;
+        }
+        
+        .nav-btn span {
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 4px;
+            letter-spacing: 0.025em;
+        }
+        
+        /* Charging Station Cards with Shadcn styling */
+        .charging-station-card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .charging-station-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: hsl(var(--primary) / 0.3);
+        }
+        
+        .charging-station-card.available {
+            border-color: hsl(142 76% 36%);
+            background: linear-gradient(to right, hsl(142 76% 36% / 0.02), hsl(142 76% 36% / 0.05));
+        }
+        
+        .charging-station-card.occupied {
+            border-color: hsl(0 84% 60%);
+            background: linear-gradient(to right, hsl(0 84% 60% / 0.02), hsl(0 84% 60% / 0.05));
+        }
+        
+        /* Modern Progress Bar */
+        .progress-container {
+            background: hsl(var(--primary) / 0.2);
+            height: 8px;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: hsl(var(--primary));
+            border-radius: 9999px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: hsl(var(--primary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: hsl(var(--primary-foreground));
+            box-shadow: 0 10px 25px -3px hsl(var(--primary) / 0.5), 0 4px 6px -2px hsl(var(--primary) / 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            z-index: 40;
+        }
+        
+        .fab:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 20px 25px -5px hsl(var(--primary) / 0.4), 0 10px 10px -5px hsl(var(--primary) / 0.04);
+        }
+        
+        .fab:active {
+            transform: translateY(0) scale(0.95);
+        }
+        
+        /* Modern Session Card */
+        .session-card {
+            background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(142 76% 36%) 100%);
+            color: hsl(var(--primary-foreground));
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px -3px hsl(var(--primary) / 0.3);
+        }
+        
+        /* Map Container */
+        #map {
+            height: 320px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* QR Scanner Modal */
+        .qr-scanner {
+            background: hsl(var(--muted) / 0.3);
+            border: 2px dashed hsl(var(--border));
+            border-radius: 16px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 16px 0;
+            min-height: 200px;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-container {
+                max-width: 430px;
+            }
+            
+            .bottom-nav {
+                max-width: 430px;
+            }
+        }
+        
+        /* Animation keyframes */
+        @keyframes pulse-gentle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .animate-pulse-gentle {
+            animation: pulse-gentle 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-codibly-gray-50">
+    <div class="mobile-container">
+        <!-- Modern Header -->
+        <div class="bg-gradient-to-r from-slate-900 to-emerald-600 text-white p-4 sticky top-0 z-40 backdrop-blur-lg border-b border-white/10">
+            <div class="flex justify-between items-center">
+                <button onclick="window.location.href='/'" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all h-8 px-3 text-white hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    Back
+                </button>
+                <div class="flex flex-col items-center">
+                    <h1 class="text-lg font-bold tracking-tight">⚡ EV Charge</h1>
+                    <img src="https://codibly.com/wp-content/uploads/2025/01/codibly-_-logo-rgb-kolor-na-jasne-1024x269-1.png" 
+                         alt="Codibly Logo" 
+                         class="h-3 opacity-80 mt-0.5">
+                </div>
+                <button onclick="openProfileMenu()" id="profileBtn" class="inline-flex items-center justify-center rounded-md transition-all w-8 h-8 text-white hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Map Screen -->
+        <div id="map-screen" class="screen active">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">Find Charging Stations</h2>
+                <div class="relative">
+                    <input type="text" placeholder="Search location or station..." 
+                           id="searchInput"
+                           oninput="handleSearch(this.value)"
+                           class="w-full h-12 px-4 pl-12 text-sm border border-slate-200 rounded-2xl bg-white shadow-sm transition-all focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 hover:shadow-md">
+                    <i data-lucide="search" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"></i>
+                    <button onclick="useCurrentLocation()" class="absolute right-2 top-2 w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 transition-colors">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="map" class="rounded-2xl overflow-hidden shadow-lg"></div>
+
+            <div class="space-y-3 mt-6" id="stations-list">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <!-- Floating Action Button for QR Scanner -->
+            <button onclick="showQRScanner()" class="fab">
+                <i data-lucide="qr-code" class="w-6 h-6"></i>
+            </button>
+
+            <div class="mb-20"></div> <!-- Space for bottom nav -->
+        </div>
+
+        <!-- Charge Screen -->
+        <div id="charge-screen" class="screen">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                    <i data-lucide="zap" class="w-8 h-8 text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">Start Charging</h2>
+                <p class="text-slate-600">Choose your preferred charging method</p>
+            </div>
+
+            <div class="space-y-4 mb-8">
+                <!-- QR Code Option -->
+                <div class="bg-card text-card-foreground flex flex-col rounded-2xl border shadow-sm overflow-hidden transition-all hover:shadow-md hover:scale-[1.02] cursor-pointer" onclick="showQRScanner()">
+                    <div class="p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="qr-code" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-slate-900 mb-1">QR Code Scan</h3>
+                                <p class="text-sm text-slate-600 mb-3">Scan the station QR code for instant access</p>
+                                <div class="flex items-center text-xs text-blue-600">
+                                    <i data-lucide="zap" class="w-3 h-3 mr-1"></i>
+                                    Most popular
+                                </div>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RFID/NFC Option -->
+                <div class="bg-card text-card-foreground flex flex-col rounded-2xl border shadow-sm overflow-hidden transition-all hover:shadow-md hover:scale-[1.02] cursor-pointer" onclick="showRFIDSimulator()">
+                    <div class="p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="credit-card" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-slate-900 mb-1">RFID/NFC Card</h3>
+                                <p class="text-sm text-slate-600 mb-3">Tap your charging card or phone</p>
+                                <div class="flex items-center text-xs text-emerald-600">
+                                    <i data-lucide="shield-check" class="w-3 h-3 mr-1"></i>
+                                    Secure & fast
+                                </div>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ad-hoc Option -->
+                <div class="bg-card text-card-foreground flex flex-col rounded-2xl border shadow-sm overflow-hidden transition-all hover:shadow-md hover:scale-[1.02] cursor-pointer" onclick="showAdHocPortal()">
+                    <div class="p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="credit-card" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-slate-900 mb-1">Pay As You Go</h3>
+                                <p class="text-sm text-slate-600 mb-3">Direct payment without registration</p>
+                                <div class="flex items-center text-xs text-orange-600">
+                                    <i data-lucide="clock" class="w-3 h-3 mr-1"></i>
+                                    No account needed
+                                </div>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Session Display -->
+            <div id="active-session" class="hidden">
+                <div class="bg-gradient-to-br from-emerald-500 to-blue-600 text-white rounded-2xl p-6 shadow-xl mb-6">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse-gentle"></div>
+                                <h3 class="text-lg font-semibold">Charging Active</h3>
+                            </div>
+                            <p class="opacity-90 text-sm" id="session-station">Station Name</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold" id="session-energy">0.0 kWh</p>
+                            <p class="opacity-90 text-sm">Energy Delivered</p>
+                        </div>
+                    </div>
+
+                    <!-- Circular Progress Ring -->
+                    <div class="flex justify-center mb-6">
+                        <div class="relative w-32 h-32">
+                            <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="4" 
+                                        fill="none" class="text-white/20"/>
+                                <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="4" 
+                                        fill="none" stroke-linecap="round" class="text-green-400 transition-all duration-500"
+                                        stroke-dasharray="314" stroke-dashoffset="314" id="progress-circle"/>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-2xl font-bold" id="session-progress-text">0%</span>
+                                <span class="text-xs opacity-75">Complete</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 text-center mb-6">
+                        <div class="bg-white/10 rounded-xl p-3 backdrop-blur">
+                            <div class="flex items-center justify-center mb-1">
+                                <i data-lucide="clock" class="w-4 h-4 mr-1 opacity-75"></i>
+                            </div>
+                            <p class="text-xl font-bold" id="session-duration">0</p>
+                            <p class="text-xs opacity-75">Minutes</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-3 backdrop-blur">
+                            <div class="flex items-center justify-center mb-1">
+                                <i data-lucide="zap" class="w-4 h-4 mr-1 opacity-75"></i>
+                            </div>
+                            <p class="text-xl font-bold" id="session-power">0</p>
+                            <p class="text-xs opacity-75">kW</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-3 backdrop-blur">
+                            <div class="flex items-center justify-center mb-1">
+                                <i data-lucide="euro" class="w-4 h-4 mr-1 opacity-75"></i>
+                            </div>
+                            <p class="text-xl font-bold" id="session-cost">€0.00</p>
+                            <p class="text-xs opacity-75">Cost</p>
+                        </div>
+                    </div>
+
+                    <button onclick="stopCharging()" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg">
+                        <i data-lucide="square" class="w-5 h-5"></i>
+                        Stop Charging
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-20"></div> <!-- Space for bottom nav -->
+        </div>
+
+        <!-- Account Screen -->
+        <div id="account-screen" class="screen">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">My Account</h2>
+                <p class="text-slate-600">Manage your profile and charging preferences</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Profile Section -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
+                    <div class="flex items-start space-x-4 mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                            <i data-lucide="user" class="w-8 h-8"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold text-slate-900 mb-1">John Doe</h3>
+                            <p class="text-slate-600 mb-2">john.doe@example.com</p>
+                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
+                                <i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>
+                                Verified
+                            </div>
+                        </div>
+                        <button onclick="editProfile()" class="p-2 rounded-xl bg-white/50 hover:bg-white/80 transition-colors">
+                            <i data-lucide="edit-3" class="w-5 h-5 text-slate-600"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="bg-white/60 rounded-xl p-4 backdrop-blur">
+                            <i data-lucide="zap" class="w-6 h-6 text-blue-600 mx-auto mb-2"></i>
+                            <p class="text-2xl font-bold text-slate-900 mb-1">12</p>
+                            <p class="text-sm text-slate-600">Sessions</p>
+                        </div>
+                        <div class="bg-white/60 rounded-xl p-4 backdrop-blur">
+                            <i data-lucide="euro" class="w-6 h-6 text-emerald-600 mx-auto mb-2"></i>
+                            <p class="text-2xl font-bold text-slate-900 mb-1">€45.60</p>
+                            <p class="text-sm text-slate-600">Total Spent</p>
+                        </div>
+                        <div class="bg-white/60 rounded-xl p-4 backdrop-blur">
+                            <i data-lucide="battery" class="w-6 h-6 text-amber-600 mx-auto mb-2"></i>
+                            <p class="text-2xl font-bold text-slate-900 mb-1">158</p>
+                            <p class="text-sm text-slate-600">kWh Total</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contract Management -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-slate-900">Contracts</h3>
+                        <button onclick="openContractManagement()" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            Manage All
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="file-text" class="w-5 h-5 text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-slate-900">Personal Contract</p>
+                                    <p class="text-sm text-slate-600">B2C Individual • €0.35/kWh</p>
+                                </div>
+                            </div>
+                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium">
+                                <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                                Active
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-slate-900">Payment Methods</h3>
+                        <button onclick="openOCPIPayments()" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            OCPI Payments
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-4 bg-gradient-to-r from-slate-900 to-slate-700 rounded-xl text-white">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="credit-card" class="w-5 h-5 text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">•••• •••• •••• 1234</p>
+                                    <p class="text-sm opacity-80">Expires 12/26 • Visa</p>
+                                </div>
+                            </div>
+                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-blue-500 text-white text-sm font-medium">
+                                <i data-lucide="check" class="w-3 h-3 mr-1"></i>
+                                Default
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roaming Partners -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm cursor-pointer card-hover" onclick="openRoamingNetworks()">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-slate-900">Roaming Partners</h3>
+                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium">
+                            <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                            3 Connected
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="link" class="w-4 h-4 text-blue-600"></i>
+                                </div>
+                                <span class="text-sm font-medium text-slate-900">Hubject Network</span>
+                            </div>
+                            <div class="inline-flex items-center text-sm text-emerald-600 font-medium">
+                                <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                                Connected
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="link" class="w-4 h-4 text-purple-600"></i>
+                                </div>
+                                <span class="text-sm font-medium text-slate-900">EIPA Network</span>
+                            </div>
+                            <div class="inline-flex items-center text-sm text-emerald-600 font-medium">
+                                <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                                Connected
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer" onclick="openOrlenIntegration()">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="fuel" class="w-4 h-4 text-orange-600"></i>
+                                </div>
+                                <span class="text-sm font-medium text-slate-900">Orlen Charge</span>
+                            </div>
+                            <div class="inline-flex items-center text-sm text-emerald-600 font-medium">
+                                <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                                Connected
+                                <i data-lucide="chevron-right" class="w-4 h-4 ml-2 text-slate-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-4">Settings & Support</h3>
+                    <div class="space-y-2">
+                        <button class="w-full flex items-center justify-between p-3 text-left hover:bg-slate-50 rounded-xl transition-colors group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                                    <i data-lucide="bell" class="w-4 h-4 text-blue-600"></i>
+                                </div>
+                                <span class="font-medium text-slate-900">Notifications</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                        </button>
+                        <button class="w-full flex items-center justify-between p-3 text-left hover:bg-slate-50 rounded-xl transition-colors group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                    <i data-lucide="shield" class="w-4 h-4 text-emerald-600"></i>
+                                </div>
+                                <span class="font-medium text-slate-900">Privacy & Security</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                        </button>
+                        <button class="w-full flex items-center justify-between p-3 text-left hover:bg-slate-50 rounded-xl transition-colors group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                                    <i data-lucide="help-circle" class="w-4 h-4 text-amber-600"></i>
+                                </div>
+                                <span class="font-medium text-slate-900">Help & Support</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-20"></div> <!-- Space for bottom nav -->
+        </div>
+
+        <!-- QR Scanner Modal -->
+        <div id="qr-modal" class="hidden fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-auto shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <i data-lucide="qr-code" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Scan QR Code</h3>
+                    <p class="text-slate-600">Point your camera at the station QR code</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center mb-8 relative overflow-hidden">
+                    <!-- Scanning Animation -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-pulse"></div>
+                    
+                    <div class="relative z-10">
+                        <i data-lucide="camera" class="w-12 h-12 text-slate-400 mx-auto mb-4"></i>
+                        <p class="text-slate-500 font-medium mb-6">Camera Simulation</p>
+                        
+                        <!-- QR Code Preview -->
+                        <div class="bg-white p-3 rounded-xl mb-6 mx-auto max-w-24 shadow-sm">
+                            <div class="grid grid-cols-4 gap-1">
+                                <div class="h-2 bg-slate-900 rounded-sm"></div>
+                                <div class="h-2 bg-slate-200 rounded-sm"></div>
+                                <div class="h-2 bg-slate-900 rounded-sm"></div>
+                                <div class="h-2 bg-slate-200 rounded-sm"></div>
+                                <div class="h-2 bg-slate-200 rounded-sm"></div>
+                                <div class="h-2 bg-slate-900 rounded-sm"></div>
+                                <div class="h-2 bg-slate-200 rounded-sm"></div>
+                                <div class="h-2 bg-slate-900 rounded-sm"></div>
+                                <div class="h-2 bg-slate-900 rounded-sm"></div>
+                                <div class="h-2 bg-slate-200 rounded-sm"></div>
+                                <div class="h-2 bg-slate-900 rounded-sm"></div>
+                                <div class="h-2 bg-slate-200 rounded-sm"></div>
+                                <div class="h-2 bg-slate-200 rounded-sm"></div>
+                                <div class="h-2 bg-slate-900 rounded-sm"></div>
+                                <div class="h-2 bg-slate-200 rounded-sm"></div>
+                                <div class="h-2 bg-slate-900 rounded-sm"></div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="simulateQRScan()" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all h-11 px-6 bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-4 focus-visible:ring-blue-500/20 shadow-lg hover:shadow-xl hover:scale-105">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            Simulate QR Scan
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="closeQRScanner()" class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all h-11 px-6 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                        Cancel
+                    </button>
+                    <button onclick="simulateQRScan()" class="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all h-11 px-6 bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-4 focus-visible:ring-emerald-500/20">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        Demo Scan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-slate-200 backdrop-blur-lg bg-white/95">
+            <div class="max-w-md mx-auto flex justify-around items-center py-2">
+                <a href="#" onclick="showScreen('map')" class="flex flex-col items-center justify-center px-4 py-2 rounded-2xl transition-all duration-200 group active" id="nav-map">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-1 bg-blue-100 group-hover:bg-blue-200">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-blue-600"></i>
+                    </div>
+                    <span class="text-xs font-medium text-blue-600 group-hover:text-blue-700">Map</span>
+                </a>
+                <a href="#" onclick="showScreen('charge')" class="flex flex-col items-center justify-center px-4 py-2 rounded-2xl transition-all duration-200 group" id="nav-charge">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-1 bg-slate-100 group-hover:bg-blue-100">
+                        <i data-lucide="zap" class="w-5 h-5 text-slate-500 group-hover:text-blue-600"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 group-hover:text-blue-600">Charge</span>
+                </a>
+                <a href="#" onclick="showScreen('account')" class="flex flex-col items-center justify-center px-4 py-2 rounded-2xl transition-all duration-200 group" id="nav-account">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-1 bg-slate-100 group-hover:bg-blue-100">
+                        <i data-lucide="user" class="w-5 h-5 text-slate-500 group-hover:text-blue-600"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 group-hover:text-blue-600">Account</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/emsp-app.js"></script>
+</body>
+</html>
