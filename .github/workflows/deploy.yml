@@ -1,0 +1,114 @@
+name: 🚀 Deploy EV Charging Platform
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔧 Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: 📋 Display configuration
+      run: |
+        echo "🏗️  Deploying EV Charging Platform"
+        echo "📦 S3 Bucket: ${{ secrets.S3_BUCKET }}"
+        echo "🌐 CloudFront Distribution: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
+        echo "🔄 Commit: ${GITHUB_SHA::8}"
+
+    - name: 🗂️  Prepare deployment files
+      run: |
+        echo "📁 Preparing files for deployment..."
+        
+        # Create deployment structure
+        mkdir -p deploy-temp
+        
+        # Copy all static files from public/ to deployment directory
+        cp -r public/* deploy-temp/
+        
+        # List files to be deployed
+        echo "📋 Files to deploy:"
+        find deploy-temp -type f | sort
+
+    - name: 📤 Deploy to S3
+      run: |
+        echo "🚀 Uploading files to S3..."
+        
+        # Upload HTML files with correct content type
+        aws s3 sync deploy-temp/ s3://${{ secrets.S3_BUCKET }}/ev-charging-platform/ \
+          --delete \
+          --exact-timestamps \
+          --exclude "*" \
+          --include "*.html" \
+          --content-type "text/html" \
+          --cache-control "public, max-age=3600"
+        
+        # Upload JavaScript files with correct content type  
+        aws s3 sync deploy-temp/ s3://${{ secrets.S3_BUCKET }}/ev-charging-platform/ \
+          --delete \
+          --exact-timestamps \
+          --exclude "*" \
+          --include "*.js" \
+          --content-type "application/javascript" \
+          --cache-control "public, max-age=86400"
+        
+        # Upload CSS files (if any)
+        aws s3 sync deploy-temp/ s3://${{ secrets.S3_BUCKET }}/ev-charging-platform/ \
+          --delete \
+          --exact-timestamps \
+          --exclude "*" \
+          --include "*.css" \
+          --content-type "text/css" \
+          --cache-control "public, max-age=86400"
+        
+        # Upload any remaining files
+        aws s3 sync deploy-temp/ s3://${{ secrets.S3_BUCKET }}/ev-charging-platform/ \
+          --delete \
+          --exact-timestamps \
+          --exclude "*.html" \
+          --exclude "*.js" \
+          --exclude "*.css"
+
+    - name: 🔄 Invalidate CloudFront cache
+      run: |
+        echo "🧹 Invalidating CloudFront cache..."
+        INVALIDATION_ID=$(aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+          --paths "/*" \
+          --query 'Invalidation.Id' \
+          --output text)
+        
+        echo "📝 Invalidation ID: $INVALIDATION_ID"
+        echo "⏳ Cache invalidation started. Changes will be live in 1-2 minutes."
+
+    - name: ✅ Deployment complete
+      run: |
+        echo "🎉 Deployment successful!"
+        echo ""
+        echo "🌐 Your EV Charging Platform is now live at:"
+        echo "   https://ev-charging-platform.dev.codibly.com"
+        echo "   https://d33jfqhd90myjn.cloudfront.net"
+        echo ""
+        echo "📊 Deployment details:"
+        echo "   Commit: ${GITHUB_SHA}"
+        echo "   Deployed by: ${GITHUB_ACTOR}"
+        echo "   Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+
+    - name: 🚨 Notify on failure
+      if: failure()
+      run: |
+        echo "❌ Deployment failed!"
+        echo "🔍 Check the logs above for details"
+        echo "📧 Consider setting up Slack/email notifications for production"
+        exit 1
