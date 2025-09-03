@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Intelligence Hub - EV Charging Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .ai-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(.33);
+            }
+            80%, 100% {
+                opacity: 0;
+            }
+        }
+        
+        .reasoning-step {
+            transition: all 0.3s ease;
+        }
+        
+        .reasoning-step:hover {
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- Header -->
+    <header class="ai-gradient text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        <span>Back to Home</span>
+                    </a>
+                    <div class="h-6 w-px bg-white/20"></div>
+                    <h1 class="text-2xl font-bold flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-8 h-8 bg-white/20 rounded-xl backdrop-blur-sm flex items-center justify-center">
+                                <i data-lucide="brain" class="w-5 h-5 text-white"></i>
+                            </div>
+                            <div class="absolute inset-0 w-8 h-8 bg-white/10 rounded-xl pulse-ring"></div>
+                        </div>
+                        AI Intelligence Hub
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <img src="https://codibly.com/wp-content/uploads/2025/01/codibly-_-logo-rgb-kolor-na-jasne-1024x269-1.png" 
+                         alt="Codibly Logo" 
+                         class="h-6 opacity-90">
+                    <div class="flex items-center space-x-2 text-sm">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-white/90">AI Active</span>
+                    </div>
+                    <button class="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm">
+                        <i data-lucide="settings" class="w-5 h-5 text-white"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- AI Services Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Charging Optimizer</h3>
+                <p class="text-slate-600 text-sm mb-4">AI-powered optimization for charging schedules and energy distribution</p>
+                <button onclick="openChargingOptimizer()" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium">
+                    Run Analysis
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Dynamic Pricing</h3>
+                <p class="text-slate-600 text-sm mb-4">Intelligent pricing algorithms based on demand and network conditions</p>
+                <button onclick="openDynamicPricing()" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm font-medium">
+                    Configure Pricing
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="shield" class="w-6 h-6 text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Fraud Detection</h3>
+                <p class="text-slate-600 text-sm mb-4">Advanced fraud detection and prevention using machine learning</p>
+                <button onclick="openFraudDetection()" class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
+                    View Threats
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="balance-scale" class="w-6 h-6 text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Load Balancing</h3>
+                <p class="text-slate-600 text-sm mb-4">Smart load distribution across charging network infrastructure</p>
+                <button onclick="openLoadBalancing()" class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-sm font-medium">
+                    Balance Load
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="euro" class="w-6 h-6 text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">OCPI Settlement</h3>
+                <p class="text-slate-600 text-sm mb-4">Automated settlement processing for OCPI roaming transactions</p>
+                <button onclick="openOCPISettlement()" class="w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors text-sm font-medium">
+                    Process Settlement
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                    <i data-lucide="route" class="w-6 h-6 text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Session Planning</h3>
+                <p class="text-slate-600 text-sm mb-4">AI-driven charging session planning and route optimization</p>
+                <button onclick="openSessionPlanning()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium">
+                    Plan Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Sequential Thinking Demo -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-8">
+            <div class="p-6 border-b border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-slate-900 mb-2">Sequential Thinking Engine</h2>
+                        <p class="text-slate-600">Watch AI reasoning process in real-time</p>
+                    </div>
+                    <button id="startReasoning" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg transition-all shadow-lg hover:shadow-xl font-medium">
+                        Start Reasoning
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div id="reasoningSteps" class="space-y-4">
+                    <!-- Reasoning steps will be populated by JavaScript -->
+                    <div class="text-center py-12 text-slate-500">
+                        <i data-lucide="brain" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+                        <p>Click "Start Reasoning" to see AI thinking process</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Metrics -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">Processing Power</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-600">CPU Usage</span>
+                        <span class="text-sm font-medium text-slate-900">73%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full w-[73%] transition-all duration-300"></div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-600">Memory</span>
+                        <span class="text-sm font-medium text-slate-900">45%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                        <div class="bg-emerald-500 h-2 rounded-full w-[45%] transition-all duration-300"></div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-600">GPU Usage</span>
+                        <span class="text-sm font-medium text-slate-900">89%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                        <div class="bg-purple-500 h-2 rounded-full w-[89%] transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">AI Performance</h3>
+                <div class="space-y-4">
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-slate-900 mb-1">97.3%</p>
+                        <p class="text-sm text-slate-600">Accuracy Rate</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-slate-900 mb-1">124ms</p>
+                        <p class="text-sm text-slate-600">Avg Response Time</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-slate-900 mb-1">1,247</p>
+                        <p class="text-sm text-slate-600">Decisions Today</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">Recent Insights</h3>
+                <div class="space-y-3">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-900">Peak demand optimization</p>
+                            <p class="text-xs text-slate-600">Reduced wait times by 23%</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-900">Fraud pattern detected</p>
+                            <p class="text-xs text-slate-600">Prevented €2,400 in losses</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-900">Energy efficiency gain</p>
+                            <p class="text-xs text-slate-600">12% improvement this week</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Sequential Thinking Demo
+        document.getElementById('startReasoning').addEventListener('click', function() {
+            const steps = [
+                { id: 1, text: "Analyzing current network load and demand patterns...", type: "info" },
+                { id: 2, text: "Identifying peak usage times and potential bottlenecks...", type: "warning" },
+                { id: 3, text: "Calculating optimal pricing adjustments based on demand...", type: "info" },
+                { id: 4, text: "Evaluating energy grid capacity and availability...", type: "info" },
+                { id: 5, text: "Detecting anomalous usage patterns for fraud prevention...", type: "warning" },
+                { id: 6, text: "Optimizing load distribution across charging stations...", type: "success" },
+                { id: 7, text: "Generating recommendations for network improvements...", type: "success" },
+                { id: 8, text: "Analysis complete! Recommendations ready for implementation.", type: "success" }
+            ];
+            
+            const container = document.getElementById('reasoningSteps');
+            container.innerHTML = '';
+            this.disabled = true;
+            this.textContent = 'Processing...';
+            
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    const stepElement = document.createElement('div');
+                    stepElement.className = `reasoning-step flex items-start space-x-4 p-4 rounded-xl ${
+                        step.type === 'success' ? 'bg-emerald-50 border border-emerald-200' :
+                        step.type === 'warning' ? 'bg-amber-50 border border-amber-200' :
+                        'bg-blue-50 border border-blue-200'
+                    }`;
+                    
+                    stepElement.innerHTML = `
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                            step.type === 'success' ? 'bg-emerald-100' :
+                            step.type === 'warning' ? 'bg-amber-100' :
+                            'bg-blue-100'
+                        }">
+                            <span class="text-sm font-bold ${
+                                step.type === 'success' ? 'text-emerald-600' :
+                                step.type === 'warning' ? 'text-amber-600' :
+                                'text-blue-600'
+                            }">${step.id}</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-900 font-medium">${step.text}</p>
+                        </div>
+                        <div class="w-6 h-6 ${
+                            step.type === 'success' ? 'text-emerald-500' :
+                            step.type === 'warning' ? 'text-amber-500' :
+                            'text-blue-500'
+                        }">
+                            <i data-lucide="${
+                                step.type === 'success' ? 'check-circle' :
+                                step.type === 'warning' ? 'alert-triangle' :
+                                'info'
+                            }" class="w-5 h-5"></i>
+                        </div>
+                    `;
+                    
+                    container.appendChild(stepElement);
+                    lucide.createIcons(); // Reinitialize icons for new elements
+                    
+                    // Scroll to the new step
+                    stepElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                    // Reset button when done
+                    if (index === steps.length - 1) {
+                        setTimeout(() => {
+                            document.getElementById('startReasoning').disabled = false;
+                            document.getElementById('startReasoning').textContent = 'Start Reasoning';
+                        }, 1000);
+                    }
+                }, index * 800);
+            });
+        });
+
+        // AI Service Modal Functions
+        function openChargingOptimizer() {
+            const modalContent = `
+                <div id="aiServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div class="p-6 border-b border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <h2 class="text-xl font-semibold text-slate-900">Charging Optimizer</h2>
+                                </div>
+                                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-700">
+                                    <i data-lucide="x" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Optimization Parameters</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Time Window</label>
+                                            <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option>Next 24 hours</option>
+                                                <option>Next 48 hours</option>
+                                                <option>Next week</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Priority</label>
+                                            <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option>Energy efficiency</option>
+                                                <option>Revenue optimization</option>
+                                                <option>User satisfaction</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Current Network Status</h3>
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <div class="text-center p-4 bg-blue-50 rounded-xl">
+                                            <p class="text-2xl font-bold text-blue-600">847</p>
+                                            <p class="text-sm text-blue-700">Active Sessions</p>
+                                        </div>
+                                        <div class="text-center p-4 bg-emerald-50 rounded-xl">
+                                            <p class="text-2xl font-bold text-emerald-600">92%</p>
+                                            <p class="text-sm text-emerald-700">Efficiency Rate</p>
+                                        </div>
+                                        <div class="text-center p-4 bg-purple-50 rounded-xl">
+                                            <p class="text-2xl font-bold text-purple-600">€2,847</p>
+                                            <p class="text-sm text-purple-700">Today Revenue</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button onclick="closeModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium">
+                                        Cancel
+                                    </button>
+                                    <button onclick="runOptimization()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">
+                                        Run Optimization
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalContent);
+            lucide.createIcons();
+        }
+
+        function openDynamicPricing() {
+            const modalContent = `
+                <div id="aiServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div class="p-6 border-b border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="trending-up" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <h2 class="text-xl font-semibold text-slate-900">Dynamic Pricing</h2>
+                                </div>
+                                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-700">
+                                    <i data-lucide="x" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Pricing Strategy</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Base Rate (€/kWh)</label>
+                                            <input type="number" value="0.35" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Peak Hour Multiplier</label>
+                                            <input type="number" value="1.5" step="0.1" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                        </div>
+                                        <div>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" checked class="rounded border-gray-300 text-emerald-600 shadow-sm focus:border-emerald-300 focus:ring focus:ring-emerald-200 focus:ring-opacity-50">
+                                                <span class="ml-2 text-sm text-slate-700">Enable demand-based pricing</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Current Pricing Impact</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="p-4 bg-emerald-50 rounded-xl">
+                                            <p class="text-xl font-bold text-emerald-600">+23%</p>
+                                            <p class="text-sm text-emerald-700">Revenue Increase</p>
+                                        </div>
+                                        <div class="p-4 bg-blue-50 rounded-xl">
+                                            <p class="text-xl font-bold text-blue-600">89%</p>
+                                            <p class="text-sm text-blue-700">Station Utilization</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button onclick="closeModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium">
+                                        Cancel
+                                    </button>
+                                    <button onclick="applyPricing()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium">
+                                        Apply Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalContent);
+            lucide.createIcons();
+        }
+
+        function openFraudDetection() {
+            const modalContent = `
+                <div id="aiServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                        <div class="p-6 border-b border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <h2 class="text-xl font-semibold text-slate-900">Fraud Detection</h2>
+                                </div>
+                                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-700">
+                                    <i data-lucide="x" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="text-center p-4 bg-red-50 rounded-xl">
+                                        <p class="text-2xl font-bold text-red-600">7</p>
+                                        <p class="text-sm text-red-700">High Risk Alerts</p>
+                                    </div>
+                                    <div class="text-center p-4 bg-amber-50 rounded-xl">
+                                        <p class="text-2xl font-bold text-amber-600">23</p>
+                                        <p class="text-sm text-amber-700">Medium Risk</p>
+                                    </div>
+                                    <div class="text-center p-4 bg-emerald-50 rounded-xl">
+                                        <p class="text-2xl font-bold text-emerald-600">€12,400</p>
+                                        <p class="text-sm text-emerald-700">Prevented Loss</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Recent Threats</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between p-4 border border-red-200 bg-red-50 rounded-xl">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                <div>
+                                                    <p class="font-medium text-slate-900">Multiple failed authentication attempts</p>
+                                                    <p class="text-sm text-slate-600">Station ID: CS-4471 • 2 minutes ago</p>
+                                                </div>
+                                            </div>
+                                            <button class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg">
+                                                Block
+                                            </button>
+                                        </div>
+                                        <div class="flex items-center justify-between p-4 border border-amber-200 bg-amber-50 rounded-xl">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                                                <div>
+                                                    <p class="font-medium text-slate-900">Unusual charging pattern detected</p>
+                                                    <p class="text-sm text-slate-600">Card: ****1234 • 15 minutes ago</p>
+                                                </div>
+                                            </div>
+                                            <button class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-lg">
+                                                Investigate
+                                            </button>
+                                        </div>
+                                        <div class="flex items-center justify-between p-4 border border-red-200 bg-red-50 rounded-xl">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                                <div>
+                                                    <p class="font-medium text-slate-900">Compromised RFID card detected</p>
+                                                    <p class="text-sm text-slate-600">Card: ****9876 • 1 hour ago</p>
+                                                </div>
+                                            </div>
+                                            <button class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg">
+                                                Block
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button onclick="closeModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium">
+                                        Close
+                                    </button>
+                                    <button class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium">
+                                        Export Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalContent);
+            lucide.createIcons();
+        }
+
+        function openLoadBalancing() {
+            const modalContent = `
+                <div id="aiServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div class="p-6 border-b border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="balance-scale" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <h2 class="text-xl font-semibold text-slate-900">Load Balancing</h2>
+                                </div>
+                                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-700">
+                                    <i data-lucide="x" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Grid Distribution</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm font-medium text-slate-700">Zone A (Downtown)</span>
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-32 bg-slate-200 rounded-full h-2">
+                                                    <div class="bg-purple-500 h-2 rounded-full w-[78%]"></div>
+                                                </div>
+                                                <span class="text-sm text-slate-600">78%</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm font-medium text-slate-700">Zone B (Business)</span>
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-32 bg-slate-200 rounded-full h-2">
+                                                    <div class="bg-emerald-500 h-2 rounded-full w-[45%]"></div>
+                                                </div>
+                                                <span class="text-sm text-slate-600">45%</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm font-medium text-slate-700">Zone C (Residential)</span>
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-32 bg-slate-200 rounded-full h-2">
+                                                    <div class="bg-blue-500 h-2 rounded-full w-[62%]"></div>
+                                                </div>
+                                                <span class="text-sm text-slate-600">62%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Balancing Options</h3>
+                                    <div class="space-y-3">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="balanceMode" value="auto" checked class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                            <span class="ml-2 text-sm text-slate-700">Automatic balancing</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="balanceMode" value="manual" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                            <span class="ml-2 text-sm text-slate-700">Manual intervention</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="balanceMode" value="schedule" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                            <span class="ml-2 text-sm text-slate-700">Scheduled balancing</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-4 bg-purple-50 rounded-xl text-center">
+                                        <p class="text-xl font-bold text-purple-600">847 kW</p>
+                                        <p class="text-sm text-purple-700">Total Load</p>
+                                    </div>
+                                    <div class="p-4 bg-blue-50 rounded-xl text-center">
+                                        <p class="text-xl font-bold text-blue-600">1,200 kW</p>
+                                        <p class="text-sm text-blue-700">Available Capacity</p>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button onclick="closeModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium">
+                                        Cancel
+                                    </button>
+                                    <button onclick="applyLoadBalance()" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium">
+                                        Apply Balance
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalContent);
+            lucide.createIcons();
+        }
+
+        function openOCPISettlement() {
+            const modalContent = `
+                <div id="aiServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                        <div class="p-6 border-b border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="euro" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <h2 class="text-xl font-semibold text-slate-900">OCPI Settlement</h2>
+                                </div>
+                                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-700">
+                                    <i data-lucide="x" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="text-center p-4 bg-amber-50 rounded-xl">
+                                        <p class="text-2xl font-bold text-amber-600">€47,832</p>
+                                        <p class="text-sm text-amber-700">Pending Settlements</p>
+                                    </div>
+                                    <div class="text-center p-4 bg-emerald-50 rounded-xl">
+                                        <p class="text-2xl font-bold text-emerald-600">€128,947</p>
+                                        <p class="text-sm text-emerald-700">Processed Today</p>
+                                    </div>
+                                    <div class="text-center p-4 bg-blue-50 rounded-xl">
+                                        <p class="text-2xl font-bold text-blue-600">247</p>
+                                        <p class="text-sm text-blue-700">Roaming Partners</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Pending Settlements</h3>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-sm">
+                                            <thead class="bg-slate-50">
+                                                <tr>
+                                                    <th class="px-4 py-3 text-left font-medium text-slate-700">Partner</th>
+                                                    <th class="px-4 py-3 text-left font-medium text-slate-700">Amount</th>
+                                                    <th class="px-4 py-3 text-left font-medium text-slate-700">Sessions</th>
+                                                    <th class="px-4 py-3 text-left font-medium text-slate-700">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-200">
+                                                <tr>
+                                                    <td class="px-4 py-3">ChargePoint Network</td>
+                                                    <td class="px-4 py-3 font-medium">€12,847</td>
+                                                    <td class="px-4 py-3">247</td>
+                                                    <td class="px-4 py-3">
+                                                        <span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">Pending</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-3">EVBox Solutions</td>
+                                                    <td class="px-4 py-3 font-medium">€8,234</td>
+                                                    <td class="px-4 py-3">156</td>
+                                                    <td class="px-4 py-3">
+                                                        <span class="px-2 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">Ready</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-4 py-3">Tesla Supercharger</td>
+                                                    <td class="px-4 py-3 font-medium">€26,751</td>
+                                                    <td class="px-4 py-3">89</td>
+                                                    <td class="px-4 py-3">
+                                                        <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">Processing</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between">
+                                    <button class="px-4 py-2 text-amber-600 hover:text-amber-800 font-medium">
+                                        View Settlement History
+                                    </button>
+                                    <div class="flex space-x-3">
+                                        <button onclick="closeModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium">
+                                            Close
+                                        </button>
+                                        <button onclick="processSettlements()" class="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium">
+                                            Process All
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalContent);
+            lucide.createIcons();
+        }
+
+        function openSessionPlanning() {
+            const modalContent = `
+                <div id="aiServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div class="p-6 border-b border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                                        <i data-lucide="route" class="w-5 h-5 text-white"></i>
+                                    </div>
+                                    <h2 class="text-xl font-semibold text-slate-900">Session Planning</h2>
+                                </div>
+                                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-700">
+                                    <i data-lucide="x" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Route Planning</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Starting Point</label>
+                                            <input type="text" placeholder="Enter address" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Destination</label>
+                                            <input type="text" placeholder="Enter destination" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Vehicle Information</h3>
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Battery %</label>
+                                            <input type="number" value="68" min="0" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Range (km)</label>
+                                            <input type="number" value="427" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 mb-2">Target %</label>
+                                            <input type="number" value="80" min="0" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-slate-900 mb-3">Recommended Stations</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between p-4 border border-slate-200 rounded-xl">
+                                            <div>
+                                                <p class="font-medium text-slate-900">SuperCharge Station A1</p>
+                                                <p class="text-sm text-slate-600">150 kW • 12 min • €0.45/kWh</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-sm font-medium text-emerald-600">Available</p>
+                                                <p class="text-xs text-slate-500">2.3 km</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between p-4 border border-slate-200 rounded-xl">
+                                            <div>
+                                                <p class="font-medium text-slate-900">FastCharge Hub B2</p>
+                                                <p class="text-sm text-slate-600">75 kW • 18 min • €0.38/kWh</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-sm font-medium text-amber-600">Busy</p>
+                                                <p class="text-xs text-slate-500">4.7 km</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button onclick="closeModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium">
+                                        Cancel
+                                    </button>
+                                    <button onclick="createPlan()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
+                                        Create Plan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalContent);
+            lucide.createIcons();
+        }
+
+        // Modal utility functions
+        function closeModal() {
+            const modal = document.getElementById('aiServiceModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Service action functions
+        function runOptimization() {
+            alert('Running charging optimization analysis...');
+            closeModal();
+        }
+
+        function applyPricing() {
+            alert('Dynamic pricing configuration applied successfully!');
+            closeModal();
+        }
+
+        function applyLoadBalance() {
+            alert('Load balancing configuration applied!');
+            closeModal();
+        }
+
+        function processSettlements() {
+            alert('Processing OCPI settlements...');
+            closeModal();
+        }
+
+        function createPlan() {
+            alert('Charging session plan created successfully!');
+            closeModal();
+        }
+    </script>
+</body>
+</html>
